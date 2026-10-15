@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión de Productos</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #f4f6f9;
+            padding: 30px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: 0 auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #2c3e50;
+        }
+
+        .search-box {
+            margin-bottom: 15px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #3498db;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .btn-add {
+            background-color: #27ae60;
+            color: white;
+            grid-column: span 2;
+        }
+
+        .btn-cancel {
+            background-color: #95a5a6;
+            color: white;
+            display: none;
+        }
+
+        .btn-edit {
+            background-color: #f39c12;
+            color: white;
+            margin-right: 5px;
+        }
+
+        .btn-delete {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #e1e1e1;
+        }
+
+        th {
+            background-color: #34495e;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .empty-msg {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>📦 Sistema de Gestión de Productos</h1>
+
+        <!-- Search box component -->
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="🔍 Buscar producto por nombre o descripción..." onkeyup="filterProducts()">
+        </div>
+
+        <!-- Product Form (Handles both Create and Update) -->
+        <form id="productForm">
+            <input type="hidden" id="productId"> <!-- Stores the product ID during edit operations -->
+            <div class="form-group">
+                <input type="text" id="name" placeholder="Nombre del producto" required>
+                <input type="text" id="description" placeholder="Descripción" required>
+                <input type="number" step="0.01" id="price" placeholder="Precio ($)" required>
+                <button type="submit" id="btnSave" class="btn-add">➕ Guardar Producto</button>
+                <button type="button" id="btnCancel" class="btn-cancel" onclick="resetForm()">❌ Cancelar</button>
+            </div>
+        </form>
+
+        <!-- Product Table -->
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Precio</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="productTableBody">
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const API_URL = '/api/products';
+        let allProducts = []; // Stores products locally for fast client-side filtering
+
+        // Fetch products when the DOM content is fully loaded
+        document.addEventListener('DOMContentLoaded', loadProducts);
+
+        // 1. Fetch products list from backend API (GET)
+        async function loadProducts() {
+            try {
+                const response = await fetch(API_URL);
+                allProducts = await response.json();
+                renderTable(allProducts);
+            } catch (error) {
+                console.error('Error loading products:', error);
+            }
+        }
+
+        // Render products inside the HTML table
+        function renderTable(products) {
+            const tableBody = document.getElementById('productTableBody');
+            tableBody.innerHTML = '';
+
+            if (products.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="5" class="empty-msg">No se encontraron productos.</td></tr>`;
+                return;
+            }
+
+            products.forEach(product => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${product.id}</td>
+                    <td><strong>${product.name}</strong></td>
+                    <td>${product.description}</td>
+                    <td>$${product.price.toFixed(2)}</td>
+                    <td>
+                        <button class="btn-edit" onclick="prepareEdit(${product.id}, '${product.name}', '${product.description}', ${product.price})">✏️ Editar</button>
+                        <button class="btn-delete" onclick="deleteProduct(${product.id})">🗑️ Eliminar</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // 2. Real-time client-side search filter
+        function filterProducts() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = allProducts.filter(p => 
+                p.name.toLowerCase().includes(query) || 
+                p.description.toLowerCase().includes(query)
+            );
+            renderTable(filtered);
+        }
+
+        // 3. Handle form submission for both Create (POST) and Update (PUT)
+        document.getElementById('productForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const id = document.getElementById('productId').value;
+            const productData = {
+                name: document.getElementById('name').value,
+                description: document.getElementById('description').value,
+                price: parseFloat(document.getElementById('price').value)
+            };
+
+            const isEdit = id !== "";
+            const url = isEdit ? `${API_URL}/${id}` : API_URL;
+            const method = isEdit ? 'PUT' : 'POST';
+
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(productData)
+                });
+
+                if (response.ok) {
+                    resetForm();
+                    loadProducts();
+                }
+            } catch (error) {
+                console.error('Error saving product:', error);
+            }
+        });
+
+        // Populate form fields to edit an existing product
+        function prepareEdit(id, name, description, price) {
+            document.getElementById('productId').value = id;
+            document.getElementById('name').value = name;
+            document.getElementById('description').value = description;
+            document.getElementById('price').value = price;
+
+            document.getElementById('btnSave').innerText = '💾 Actualizar Producto';
+            document.getElementById('btnCancel').style.display = 'inline-block';
+        }
+
+        // Reset form inputs and restore default action state
+        function resetForm() {
+            document.getElementById('productForm').reset();
+            document.getElementById('productId').value = '';
+            document.getElementById('btnSave').innerText = '➕ Guardar Producto';
+            document.getElementById('btnCancel').style.display = 'none';
+        }
+
+        // 4. Delete product by ID (DELETE)
+        async function deleteProduct(id) {
+            if (confirm(`¿Eliminar producto ID ${id}?`)) {
+                try {
+                    const response = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+                    if (response.ok) loadProducts();
+                } catch (error) {
+                    console.error('Error deleting product:', error);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
