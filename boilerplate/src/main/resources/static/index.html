@@ -3,215 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Gestión de Productos</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            background-color: #f4f6f9;
-            padding: 30px;
-            color: #333;
-        }
-
-        .container {
-            max-width: 950px;
-            margin: 0 auto;
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-
-        h1 {
-            text-align: center;
-            margin-bottom: 25px;
-            color: #2c3e50;
-        }
-
-        .search-box {
-            margin-bottom: 15px;
-        }
-
-        .search-box input {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #3498db;
-            border-radius: 5px;
-            font-size: 14px;
-        }
-
-        .form-group {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        input {
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 14px;
-        }
-
-        button {
-            padding: 10px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.2s;
-        }
-
-        .btn-add {
-            background-color: #27ae60;
-            color: white;
-            grid-column: span 2;
-        }
-
-        .btn-cancel {
-            background-color: #95a5a6;
-            color: white;
-            display: none;
-        }
-
-        .btn-edit {
-            background-color: #f39c12;
-            color: white;
-            margin-right: 5px;
-        }
-
-        .btn-delete {
-            background-color: #e74c3c;
-            color: white;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-
-        th, td {
-            text-align: left;
-            padding: 12px;
-            border-bottom: 1px solid #e1e1e1;
-        }
-
-        th {
-            background-color: #34495e;
-            color: white;
-        }
-
-        tr:hover {
-            background-color: #f8f9fa;
-        }
-
-        .empty-msg {
-            text-align: center;
-            padding: 20px;
-            color: #7f8c8d;
-        }
-    </style>
+    <title>Gestión de Productos - Tailwind & Cards</title>
+    <!-- Tailwind CSS desde CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body>
+<body class="bg-slate-100 min-h-screen text-slate-800 p-4 md:p-8">
 
-    <div class="container">
-        <h1>📦 Sistema de Gestión de Productos</h1>
-
-        <!-- Search box component -->
-        <div class="search-box">
-            <input type="text" id="searchInput" placeholder="🔍 Buscar producto por nombre o descripción..." onkeyup="filterProducts()">
-        </div>
-
-        <!-- Product Form (Handles both Create and Update) -->
-        <form id="productForm">
-            <input type="hidden" id="productId"> <!-- Stores the product ID during edit operations -->
-            <div class="form-group">
-                <input type="text" id="name" placeholder="Nombre del producto" required>
-                <input type="text" id="description" placeholder="Descripción" required>
-                <input type="number" step="0.01" id="price" placeholder="Precio ($)" required>
-                <button type="submit" id="btnSave" class="btn-add">➕ Guardar Producto</button>
-                <button type="button" id="btnCancel" class="btn-cancel" onclick="resetForm()">❌ Cancelar</button>
+    <div class="max-w-6xl mx-auto space-y-6">
+        
+        <!-- Encabezado -->
+        <header class="flex flex-col md:flex-row justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-slate-200 gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-900 flex items-center gap-2">
+                    <i class="fa-solid fa-boxes-stacked text-indigo-600"></i> Catálogo de Productos
+                </h1>
+                <p class="text-slate-500 text-sm">Gestión e inventario conectado a Spring Boot API</p>
             </div>
-        </form>
+            
+            <!-- Buscador en tiempo real -->
+            <div class="relative w-full md:w-80">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                <input type="text" id="searchInput" onkeyup="filterProducts()" placeholder="Buscar producto..." 
+                    class="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm">
+            </div>
+        </header>
 
-        <!-- Product Table -->
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Nombre</th>
-                    <th>Descripción</th>
-                    <th>Precio</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody id="productTableBody">
-            </tbody>
-        </table>
+        <!-- Formulario de Guardado / Edición -->
+        <section class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+            <h2 id="formTitle" class="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-plus-circle text-indigo-600"></i> Agregar Nuevo Producto
+            </h2>
+            <form id="productForm" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <input type="hidden" id="productId"> <!-- Product ID for edit state -->
+                
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Nombre</label>
+                    <input type="text" id="name" required placeholder="Ej. Monitor Gamer 27''" 
+                        class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Descripción</label>
+                    <input type="text" id="description" required placeholder="Ej. Monitor IPS 144Hz 1ms" 
+                        class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Precio ($)</label>
+                    <input type="number" step="0.01" id="price" required placeholder="0.00" 
+                        class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+
+                <div class="md:col-span-3 flex justify-end gap-3 pt-2">
+                    <button type="button" id="btnCancel" onclick="resetForm()" class="hidden px-4 py-2 bg-slate-200 text-slate-700 hover:bg-slate-300 rounded-lg text-sm font-semibold transition">
+                        Cancelar
+                    </button>
+                    <button type="submit" id="btnSave" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold shadow-md transition flex items-center gap-2">
+                        <i class="fa-solid fa-floppy-disk"></i> Guardar Producto
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Grilla de Cards Responsivas (1 col en movil, 2 en tablet, 3 en escritorio) -->
+        <section>
+            <div id="cardsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Se poblará dinámicamente mediante JS -->
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Modal Detalle Extendido de la Card -->
+    <div id="detailModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 transform transition-all space-y-4">
+            <div class="flex justify-between items-start border-b border-slate-100 pb-3">
+                <span class="text-xs font-bold px-2.5 py-1 bg-indigo-100 text-indigo-700 rounded-full" id="modalId">ID: #0</span>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="space-y-2">
+                <h3 class="text-xl font-bold text-slate-900" id="modalName">Nombre del Producto</h3>
+                <p class="text-slate-600 text-sm leading-relaxed" id="modalDescription">Descripción detallada...</p>
+                <div class="pt-3 flex items-center justify-between border-t border-slate-100">
+                    <span class="text-xs text-slate-400 uppercase font-semibold">Precio de lista</span>
+                    <span class="text-2xl font-extrabold text-emerald-600" id="modalPrice">$0.00</span>
+                </div>
+            </div>
+            <div class="pt-2">
+                <button onclick="closeModal()" class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-sm font-semibold transition">
+                    Cerrar Detalle
+                </button>
+            </div>
+        </div>
     </div>
 
     <script>
         const API_URL = '/api/products';
-        let allProducts = []; // Stores products locally for fast client-side filtering
+        let allProducts = [];
 
-        // Fetch products when the DOM content is fully loaded
         document.addEventListener('DOMContentLoaded', loadProducts);
 
-        // 1. Fetch products list from backend API (GET)
+        // Version Async/Await para consumir la API REST (Promises)
         async function loadProducts() {
             try {
                 const response = await fetch(API_URL);
+                if (!response.ok) throw new Error('Network response was not ok');
                 allProducts = await response.json();
-                renderTable(allProducts);
+                renderCards(allProducts);
             } catch (error) {
-                console.error('Error loading products:', error);
+                console.error('Error fetching products:', error);
             }
         }
 
-        // Render products inside the HTML table
-        function renderTable(products) {
-            const tableBody = document.getElementById('productTableBody');
-            tableBody.innerHTML = '';
+        // Renderizado de Cards con Grid & Flexbox de Tailwind CSS
+        function renderCards(products) {
+            const grid = document.getElementById('cardsGrid');
+            grid.innerHTML = '';
 
             if (products.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="5" class="empty-msg">No se encontraron productos.</td></tr>`;
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-12 bg-white rounded-2xl border border-dashed border-slate-300">
+                        <i class="fa-regular fa-folder-open text-4xl text-slate-300 mb-2"></i>
+                        <p class="text-slate-500 font-medium">No se encontraron productos registrados.</p>
+                    </div>`;
                 return;
             }
 
             products.forEach(product => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${product.id}</td>
-                    <td><strong>${product.name}</strong></td>
-                    <td>${product.description}</td>
-                    <td>$${product.price.toFixed(2)}</td>
-                    <td>
-                        <button class="btn-edit" onclick="prepareEdit(${product.id}, '${product.name}', '${product.description}', ${product.price})">✏️ Editar</button>
-                        <button class="btn-delete" onclick="deleteProduct(${product.id})">🗑️ Eliminar</button>
-                    </td>
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-2xl p-5 shadow-sm border border-slate-200 hover:shadow-md transition flex flex-col justify-between cursor-pointer group";
+                
+                // Clicking on card opens detail modal
+                card.onclick = (e) => {
+                    // Prevent triggering modal when clicking edit or delete buttons
+                    if (e.target.closest('button')) return;
+                    openModal(product);
+                };
+
+                card.innerHTML = `
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-start">
+                            <span class="text-xs font-semibold px-2 py-1 bg-slate-100 text-slate-600 rounded-md">ID: #${product.id}</span>
+                            <span class="text-lg font-bold text-emerald-600">$${product.price.toFixed(2)}</span>
+                        </div>
+                        <h3 class="font-bold text-slate-800 group-hover:text-indigo-600 transition text-base line-clamp-1">${product.name}</h3>
+                        <p class="text-slate-500 text-xs line-clamp-2 leading-relaxed">${product.description}</p>
+                    </div>
+
+                    <div class="pt-4 mt-4 border-t border-slate-100 flex justify-end gap-2">
+                        <button onclick="prepareEdit(${product.id}, '${product.name.replace(/'/g, "\\'")}', '${product.description.replace(/'/g, "\\'")}', ${product.price})" 
+                            class="px-3 py-1.5 bg-amber-50 text-amber-600 hover:bg-amber-100 rounded-lg text-xs font-semibold transition flex items-center gap-1">
+                            <i class="fa-solid fa-pen"></i> Editar
+                        </button>
+                        <button onclick="deleteProduct(${product.id})" 
+                            class="px-3 py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-lg text-xs font-semibold transition flex items-center gap-1">
+                            <i class="fa-solid fa-trash"></i> Eliminar
+                        </button>
+                    </div>
                 `;
-                tableBody.appendChild(row);
+                grid.appendChild(card);
             });
         }
 
-        // 2. Real-time client-side search filter
+        // Real-time Search Filter using JavaScript Array Filter
         function filterProducts() {
             const query = document.getElementById('searchInput').value.toLowerCase();
             const filtered = allProducts.filter(p => 
                 p.name.toLowerCase().includes(query) || 
                 p.description.toLowerCase().includes(query)
             );
-            renderTable(filtered);
+            renderCards(filtered);
         }
 
-        // 3. Handle form submission for both Create (POST) and Update (PUT)
+        // Modal Functions for Expanded Card View
+        function openModal(product) {
+            document.getElementById('modalId').innerText = `ID: #${product.id}`;
+            document.getElementById('modalName').innerText = product.name;
+            document.getElementById('modalDescription').innerText = product.description;
+            document.getElementById('modalPrice').innerText = `$${product.price.toFixed(2)}`;
+            document.getElementById('detailModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').classList.add('hidden');
+        }
+
+        // Form Submission for Create (POST) / Update (PUT) using Async/Await Promises
         document.getElementById('productForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -235,38 +213,40 @@
 
                 if (response.ok) {
                     resetForm();
-                    loadProducts();
+                    await loadProducts();
                 }
             } catch (error) {
                 console.error('Error saving product:', error);
             }
         });
 
-        // Populate form fields to edit an existing product
+        // Prepare Form for Editing
         function prepareEdit(id, name, description, price) {
             document.getElementById('productId').value = id;
             document.getElementById('name').value = name;
             document.getElementById('description').value = description;
             document.getElementById('price').value = price;
 
-            document.getElementById('btnSave').innerText = '💾 Actualizar Producto';
-            document.getElementById('btnCancel').style.display = 'inline-block';
+            document.getElementById('formTitle').innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-500"></i> Editar Producto #${id}`;
+            document.getElementById('btnSave').innerHTML = `<i class="fa-solid fa-rotate"></i> Actualizar Producto`;
+            document.getElementById('btnCancel').classList.remove('hidden');
         }
 
-        // Reset form inputs and restore default action state
+        // Reset Form to Initial State
         function resetForm() {
             document.getElementById('productForm').reset();
             document.getElementById('productId').value = '';
-            document.getElementById('btnSave').innerText = '➕ Guardar Producto';
-            document.getElementById('btnCancel').style.display = 'none';
+            document.getElementById('formTitle').innerHTML = `<i class="fa-solid fa-plus-circle text-indigo-600"></i> Agregar Nuevo Producto`;
+            document.getElementById('btnSave').innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Guardar Producto`;
+            document.getElementById('btnCancel').classList.add('hidden');
         }
 
-        // 4. Delete product by ID (DELETE)
+        // Delete Product by ID using Async/Await Promise
         async function deleteProduct(id) {
-            if (confirm(`¿Eliminar producto ID ${id}?`)) {
+            if (confirm(`¿Eliminar producto ID #${id}?`)) {
                 try {
                     const response = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
-                    if (response.ok) loadProducts();
+                    if (response.ok) await loadProducts();
                 } catch (error) {
                     console.error('Error deleting product:', error);
                 }
