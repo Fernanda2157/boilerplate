@@ -89,7 +89,7 @@
             </div>
         </section>
 
-        <!-- Grid Principal de Tarjetas -->
+     <!-- Main Card Grid -->
         <main id="catalogView" class="pt-2">
             <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                 <!-- Se puebla dinámicamente -->
@@ -98,7 +98,7 @@
 
     </div>
 
-    <!-- Modal Emergente para Ver Detalle Extendido con Foto -->
+   <!-- Modal Popup for Extended View with Photo -->
     <div id="detailModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
         <div class="bg-[#151c33] rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-800 space-y-4">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -118,7 +118,7 @@
                     <p id="modalSubtitle" class="text-slate-400 text-xs leading-relaxed">Descripción...</p>
                     
                     <div id="modalExtra" class="pt-3 border-t border-slate-800 text-xs text-slate-300 space-y-1">
-                        <!-- Detalles dinámicos -->
+                        <!-- Dynamic details -->
                     </div>
                 </div>
             </div>
@@ -228,13 +228,13 @@
                 const card = document.createElement('div');
                 card.className = "bg-[#151c33] rounded-2xl p-4 border border-slate-800 hover:border-indigo-500/50 transition shadow-lg flex flex-col justify-between group cursor-pointer";
                 
-                // Abrir modal al hacer clic en la tarjeta
+                // Open modal on card click
                 card.onclick = (e) => {
                     if (e.target.closest('button')) return;
                     openModal(item);
                 };
 
-                // Detección y fallback de URL de imagen enviada por la API
+                // Image URL detection and fallback logic for API response
                 const imageUrl = item.image || item.imageUrl;
                 const imageSrc = imageUrl ? imageUrl : 'https://rickandmortyapi.com/api/character/avatar/' + (item.id || 1) + '.jpeg';
 
@@ -280,7 +280,7 @@
             });
         }
 
-        // Abrir ventana emergente modal con la foto e información detallada
+      // Open modal window displaying item photo and details
         function openModal(item) {
             document.getElementById('modalBadge').innerText = currentTab.toUpperCase();
             document.getElementById('modalTitle').innerText = item.name || item.title;
@@ -313,7 +313,7 @@
             document.getElementById('detailModal').classList.add('hidden');
         }
 
-        // Acciones CRUD locales (POST / PUT)
+      // Local CRUD Actions (POST / PUT)
         document.getElementById('productForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
