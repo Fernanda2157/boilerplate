@@ -1,122 +1,138 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Rick and Morty Explorer & Products</title>
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Prevents automatic zoom on iOS when focusing inputs */
+        html { -webkit-text-size-adjust: 100%; }
+        /* Hide scrollbar on tabs and modal (but keep scrolling enabled) */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        /* Safe area for iPhone notch / home indicator */
+        .safe-x { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
+        .safe-b { padding-bottom: env(safe-area-inset-bottom); }
+        /* Minimum legible input size on iOS (prevents auto-zoom) */
+        @media (max-width: 640px) {
+            input, select, textarea { font-size: 16px !important; }
+        }
+    </style>
 </head>
-<body class="bg-[#0b1329] text-slate-100 min-h-screen p-4 md:p-8 font-sans">
+<body class="bg-[#0b1329] text-slate-100 min-h-screen p-3 sm:p-4 md:p-6 lg:p-8 font-sans safe-x safe-b">
 
-    <div class="max-w-6xl mx-auto space-y-4">
-        
-      <!-- Header with dark theme -->
-        <header class="flex flex-col md:flex-row justify-between items-center bg-[#151c33] p-5 rounded-2xl border border-slate-800 gap-4 shadow-2xl">
-            <div>
-                <h1 class="text-xl font-bold text-[#818cf8] flex items-center gap-2">
-                    <i class="fa-solid fa-flask"></i> Rick and Morty Explorer & Products
+    <div class="max-w-6xl 2xl:max-w-7xl mx-auto space-y-3 sm:space-y-4">
+
+        <!-- Responsive header -->
+        <header class="flex flex-col lg:flex-row justify-between items-center bg-[#151c33] p-4 sm:p-5 rounded-2xl border border-slate-800 gap-3 sm:gap-4 shadow-2xl">
+            <div class="text-center lg:text-left w-full lg:w-auto min-w-0">
+                <h1 class="text-base sm:text-lg md:text-xl font-bold text-[#818cf8] flex items-center justify-center lg:justify-start gap-2">
+                    <i class="fa-solid fa-flask shrink-0"></i>
+                    <span class="truncate">Rick and Morty Explorer & Products</span>
                 </h1>
-                <p class="text-slate-400 text-xs mt-1">Consuming 3 external endpoints + Spring Boot API</p>
+                <p class="text-slate-400 text-[11px] sm:text-xs mt-1">Consuming 3 external endpoints + Spring Boot API</p>
             </div>
 
-       <!-- Tab navigation bar -->
-            <div class="flex gap-1.5 bg-[#0b1329] p-1.5 rounded-xl border border-slate-800 text-xs font-semibold">
-                <button onclick="switchEndpoint('characters')" id="btnTabCharacters" class="px-4 py-2 rounded-lg bg-[#6366f1] text-white shadow transition">
+            <!-- Tabs: horizontal scroll on mobile, inline row on desktop -->
+            <div class="flex gap-1.5 bg-[#0b1329] p-1.5 rounded-xl border border-slate-800 text-[11px] sm:text-xs font-semibold w-full lg:w-auto overflow-x-auto no-scrollbar">
+                <button onclick="switchEndpoint('characters')" id="btnTabCharacters" class="shrink-0 whitespace-nowrap px-3 sm:px-4 py-2 rounded-lg bg-[#6366f1] text-white shadow transition">
                     Characters
                 </button>
-                <button onclick="switchEndpoint('locations')" id="btnTabLocations" class="px-4 py-2 rounded-lg text-slate-400 hover:text-white transition">
+                <button onclick="switchEndpoint('locations')" id="btnTabLocations" class="shrink-0 whitespace-nowrap px-3 sm:px-4 py-2 rounded-lg text-slate-400 hover:text-white transition">
                     Locations
                 </button>
-                <button onclick="switchEndpoint('episodes')" id="btnTabEpisodes" class="px-4 py-2 rounded-lg text-slate-400 hover:text-white transition">
+                <button onclick="switchEndpoint('episodes')" id="btnTabEpisodes" class="shrink-0 whitespace-nowrap px-3 sm:px-4 py-2 rounded-lg text-slate-400 hover:text-white transition">
                     Episodes
                 </button>
-                <button onclick="switchEndpoint('products')" id="btnTabProducts" class="px-4 py-2 rounded-lg text-slate-400 hover:text-white transition">
+                <button onclick="switchEndpoint('products')" id="btnTabProducts" class="shrink-0 whitespace-nowrap px-3 sm:px-4 py-2 rounded-lg text-slate-400 hover:text-white transition">
                     Local Products
                 </button>
             </div>
         </header>
-<!-- CRUD Form for Local Products -->
-        <section id="productFormSection" class="hidden bg-[#151c33] p-5 rounded-2xl border border-slate-800 shadow-xl">
+
+        <!-- Responsive CRUD form -->
+        <section id="productFormSection" class="hidden bg-[#151c33] p-4 sm:p-5 rounded-2xl border border-slate-800 shadow-xl">
             <h2 id="formTitle" class="text-sm font-semibold text-[#818cf8] mb-4 flex items-center gap-2">
-                <i class="fa-solid fa-plus-circle"></i> Agregar Nuevo Producto
+                <i class="fa-solid fa-plus-circle"></i> Add New Product
             </h2>
-            <form id="productForm" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <form id="productForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 <input type="hidden" id="productId">
-                
+
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">Nombre</label>
-                    <input type="text" id="name" required placeholder="Ej. Monitor Gamer 27''" 
-                        class="w-full px-3 py-2 bg-[#0b1329] border border-slate-800 rounded-lg text-xs focus:ring-1 focus:ring-indigo-500 focus:outline-none text-white">
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Name</label>
+                    <input type="text" id="name" required placeholder="E.g. 27'' Gaming Monitor"
+                        class="w-full px-3 py-2.5 sm:py-2 bg-[#0b1329] border border-slate-800 rounded-lg text-xs focus:ring-1 focus:ring-indigo-500 focus:outline-none text-white">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">Descripción</label>
-                    <input type="text" id="description" required placeholder="Ej. IPS 144Hz 1ms" 
-                        class="w-full px-3 py-2 bg-[#0b1329] border border-slate-800 rounded-lg text-xs focus:ring-1 focus:ring-indigo-500 focus:outline-none text-white">
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Description</label>
+                    <input type="text" id="description" required placeholder="E.g. IPS 144Hz 1ms"
+                        class="w-full px-3 py-2.5 sm:py-2 bg-[#0b1329] border border-slate-800 rounded-lg text-xs focus:ring-1 focus:ring-indigo-500 focus:outline-none text-white">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">Precio ($)</label>
-                    <input type="number" step="0.01" id="price" required placeholder="0.00" 
-                        class="w-full px-3 py-2 bg-[#0b1329] border border-slate-800 rounded-lg text-xs focus:ring-1 focus:ring-indigo-500 focus:outline-none text-white">
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Price ($)</label>
+                    <input type="number" step="0.01" id="price" required placeholder="0.00"
+                        class="w-full px-3 py-2.5 sm:py-2 bg-[#0b1329] border border-slate-800 rounded-lg text-xs focus:ring-1 focus:ring-indigo-500 focus:outline-none text-white">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">URL Imagen</label>
-                    <input type="url" id="image" placeholder="https://..." 
-                        class="w-full px-3 py-2 bg-[#0b1329] border border-slate-800 rounded-lg text-xs focus:ring-1 focus:ring-indigo-500 focus:outline-none text-white">
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Image URL</label>
+                    <input type="url" id="image" placeholder="https://..."
+                        class="w-full px-3 py-2.5 sm:py-2 bg-[#0b1329] border border-slate-800 rounded-lg text-xs focus:ring-1 focus:ring-indigo-500 focus:outline-none text-white">
                 </div>
 
-                <div class="lg:col-span-4 flex justify-end gap-3 pt-2">
-                    <button type="button" id="btnCancel" onclick="resetForm()" class="hidden px-4 py-2 bg-slate-800 text-slate-300 hover:bg-slate-700 rounded-lg text-xs font-semibold transition">
-                        Cancelar
+                <!-- Buttons: stacked on mobile, inline from sm breakpoint -->
+                <div class="sm:col-span-2 lg:col-span-4 flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3 pt-2">
+                    <button type="button" id="btnCancel" onclick="resetForm()" class="hidden px-4 py-2.5 sm:py-2 bg-slate-800 text-slate-300 hover:bg-slate-700 rounded-lg text-xs font-semibold transition">
+                        Cancel
                     </button>
-                    <button type="submit" id="btnSave" class="px-5 py-2 bg-[#6366f1] hover:bg-indigo-600 text-white rounded-lg text-xs font-semibold shadow-md transition flex items-center gap-2">
-                        <i class="fa-solid fa-floppy-disk"></i> Guardar Producto
+                    <button type="submit" id="btnSave" class="px-5 py-2.5 sm:py-2 bg-[#6366f1] hover:bg-indigo-600 text-white rounded-lg text-xs font-semibold shadow-md transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-floppy-disk"></i> Save Product
                     </button>
                 </div>
             </form>
         </section>
 
-        <!-- Search bar with 4.5s delayed search indicator -->
-        <section class="bg-[#151c33] p-3 rounded-2xl border border-slate-800 shadow-xl flex flex-col md:flex-row justify-between items-center gap-3">
+        <!-- Responsive search bar -->
+        <section class="bg-[#151c33] p-3 rounded-2xl border border-slate-800 shadow-xl flex flex-col md:flex-row justify-between items-stretch md:items-center gap-3">
             <div class="relative w-full">
                 <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-                <input type="text" id="searchInput" oninput="handleDelayedSearch()" placeholder="Type to search (wait 4.5s automatically)..." 
-                    class="w-full pl-11 pr-4 py-2 bg-[#0b1329] border border-slate-800 rounded-xl focus:outline-none focus:ring-1 focus:ring-indigo-500 text-xs text-slate-200 placeholder-slate-500">
+                <input type="text" id="searchInput" oninput="handleDelayedSearch()" placeholder="Type to search (wait 4.5s automatically)..."
+                    class="w-full pl-11 pr-4 py-2.5 sm:py-2 bg-[#0b1329] border border-slate-800 rounded-xl focus:outline-none focus:ring-1 focus:ring-indigo-500 text-xs text-slate-200 placeholder-slate-500">
             </div>
-            <div id="searchStatus" class="text-xs text-indigo-400 whitespace-nowrap font-medium hidden flex items-center gap-2">
-                <i class="fa-solid fa-spinner animate-spin"></i> Buscando en 4.5s...
+            <div id="searchStatus" class="text-xs text-indigo-400 whitespace-nowrap font-medium hidden flex items-center justify-center gap-2">
+                <i class="fa-solid fa-spinner animate-spin"></i> Searching in 4.5s...
             </div>
         </section>
 
-     <!-- Main Card Grid -->
-        <main id="catalogView" class="pt-2">
-            <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                <!-- Se puebla dinámicamente -->
+        <!-- Responsive card grid: 1 → 2 → 3 → 4 → 5 columns -->
+        <main id="catalogView" class="pt-1 sm:pt-2">
+            <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-5">
+                <!-- Populated dynamically -->
             </div>
         </main>
 
     </div>
 
-   <!-- Modal Popup for Extended View with Photo -->
-    <div id="detailModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-[#151c33] rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-800 space-y-4">
+    <!-- Responsive modal with internal scroll -->
+    <div id="detailModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-md hidden flex items-center justify-center p-3 sm:p-4 z-50">
+        <div class="bg-[#151c33] rounded-2xl max-w-md w-full max-h-[92vh] overflow-y-auto no-scrollbar p-4 sm:p-6 shadow-2xl border border-slate-800 space-y-4">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
                 <span id="modalBadge" class="text-[11px] font-bold px-2.5 py-1 bg-indigo-500/20 text-indigo-300 rounded-full border border-indigo-500/30">
                     CATEGORY
                 </span>
-                <button onclick="closeModal()" class="text-slate-400 hover:text-white text-lg transition">
+                <button onclick="closeModal()" class="text-slate-400 hover:text-white text-lg transition p-1">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
-            
+
             <div class="flex flex-col items-center space-y-3">
-                <img id="modalImage" src="" alt="Detalle" class="w-full h-52 object-cover rounded-xl border border-slate-800/80 shadow-md hidden">
-                
+                <img id="modalImage" src="" alt="Detail" class="w-full h-44 sm:h-52 object-cover rounded-xl border border-slate-800/80 shadow-md hidden">
+
                 <div class="w-full space-y-2 text-left">
-                    <h3 id="modalTitle" class="text-lg font-bold text-white">Nombre del Item</h3>
-                    <p id="modalSubtitle" class="text-slate-400 text-xs leading-relaxed">Descripción...</p>
-                    
+                    <h3 id="modalTitle" class="text-base sm:text-lg font-bold text-white break-words">Item Name</h3>
+                    <p id="modalSubtitle" class="text-slate-400 text-xs leading-relaxed">Description...</p>
+
                     <div id="modalExtra" class="pt-3 border-t border-slate-800 text-xs text-slate-300 space-y-1">
                         <!-- Dynamic details -->
                     </div>
@@ -124,8 +140,8 @@
             </div>
 
             <div class="pt-2">
-                <button onclick="closeModal()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-semibold transition">
-                    Cerrar Detalle
+                <button onclick="closeModal()" class="w-full py-2.5 sm:py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-semibold transition">
+                    Close Detail
                 </button>
             </div>
         </div>
@@ -147,13 +163,13 @@
 
         function switchEndpoint(tab) {
             currentTab = tab;
-            
+
             ['characters', 'locations', 'episodes', 'products'].forEach(t => {
                 const btn = document.getElementById(`btnTab${t.charAt(0).toUpperCase() + t.slice(1)}`);
                 if (t === tab) {
-                    btn.className = 'px-4 py-2 rounded-lg bg-[#6366f1] text-white shadow transition';
+                    btn.className = 'shrink-0 whitespace-nowrap px-3 sm:px-4 py-2 rounded-lg bg-[#6366f1] text-white shadow transition';
                 } else {
-                    btn.className = 'px-4 py-2 rounded-lg text-slate-400 hover:text-white transition';
+                    btn.className = 'shrink-0 whitespace-nowrap px-3 sm:px-4 py-2 rounded-lg text-slate-400 hover:text-white transition';
                 }
             });
 
@@ -171,7 +187,7 @@
 
         async function loadTabContent(tab, searchQuery = '') {
             const grid = document.getElementById('productsGrid');
-            grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-400 text-sm"><i class="fa-solid fa-spinner animate-spin text-2xl mb-2"></i><br>Cargando ${tab}...</div>`;
+            grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-400 text-sm"><i class="fa-solid fa-spinner animate-spin text-2xl mb-2"></i><br>Loading ${tab}...</div>`;
 
             try {
                 let url = ENDPOINTS[tab];
@@ -183,9 +199,9 @@
 
                 const response = await fetch(url);
                 if (!response.ok && response.status !== 404) throw new Error(`HTTP status ${response.status}`);
-                
+
                 const data = await response.json();
-                
+
                 if (tab === 'products') {
                     fetchedData = data;
                     if (queryText) {
@@ -197,8 +213,8 @@
 
                 renderGrid(fetchedData);
             } catch (error) {
-                console.error(`Error al obtener ${tab}:`, error);
-                grid.innerHTML = `<div class="col-span-full text-center py-12 text-rose-400 text-sm">No se encontraron registros o error de red.</div>`;
+                console.error(`Error fetching ${tab}:`, error);
+                grid.innerHTML = `<div class="col-span-full text-center py-12 text-rose-400 text-sm">No records found or network error.</div>`;
             }
         }
 
@@ -220,39 +236,37 @@
             grid.innerHTML = '';
 
             if (items.length === 0) {
-                grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-sm">No hay datos para mostrar.</div>`;
+                grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-sm">No data to display.</div>`;
                 return;
             }
 
             items.forEach(item => {
                 const card = document.createElement('div');
-                card.className = "bg-[#151c33] rounded-2xl p-4 border border-slate-800 hover:border-indigo-500/50 transition shadow-lg flex flex-col justify-between group cursor-pointer";
-                
-                // Open modal on card click
+                card.className = "bg-[#151c33] rounded-2xl p-3 sm:p-4 border border-slate-800 hover:border-indigo-500/50 transition shadow-lg flex flex-col justify-between group cursor-pointer";
+
                 card.onclick = (e) => {
                     if (e.target.closest('button')) return;
                     openModal(item);
                 };
 
-                // Image URL detection and fallback logic for API response
                 const imageUrl = item.image || item.imageUrl;
                 const imageSrc = imageUrl ? imageUrl : 'https://rickandmortyapi.com/api/character/avatar/' + (item.id || 1) + '.jpeg';
 
                 const cardSubtitle = (currentTab === 'characters')
-                    ? `Especie: ${item.species || 'Human'} | Estado: ${item.status || 'Alive'}`
-                    : (item.description || item.type || item.dimension || 'Sin detalles disponibles');
+                    ? `Species: ${item.species || 'Human'} | Status: ${item.status || 'Alive'}`
+                    : (item.description || item.type || item.dimension || 'No details available');
 
                 let actionButtons = '';
                 if (currentTab === 'products') {
                     actionButtons = `
                         <div class="flex gap-2 mt-3 pt-2 border-t border-slate-800/80">
-                            <button onclick="prepareEdit(${item.id}, '${(item.name || '').replace(/'/g, "\\'")}', '${(item.description || '').replace(/'/g, "\\'")}', ${item.price || 0}, '${(imageSrc || '').replace(/'/g, "\\'")}')" 
-                                class="w-1/2 py-1.5 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 border border-amber-500/20 rounded-lg text-xs font-medium transition flex items-center justify-center gap-1">
-                                <i class="fa-solid fa-pen"></i> Editar
+                            <button onclick="prepareEdit(${item.id}, '${(item.name || '').replace(/'/g, "\\'")}', '${(item.description || '').replace(/'/g, "\\'")}', ${item.price || 0}, '${(imageSrc || '').replace(/'/g, "\\'")}')"
+                                class="w-1/2 py-2 sm:py-1.5 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 border border-amber-500/20 rounded-lg text-xs font-medium transition flex items-center justify-center gap-1">
+                                <i class="fa-solid fa-pen"></i> Edit
                             </button>
-                            <button onclick="deleteProduct(${item.id})" 
-                                class="w-1/2 py-1.5 bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 border border-rose-500/20 rounded-lg text-xs font-medium transition flex items-center justify-center gap-1">
-                                <i class="fa-solid fa-trash"></i> Eliminar
+                            <button onclick="deleteProduct(${item.id})"
+                                class="w-1/2 py-2 sm:py-1.5 bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 border border-rose-500/20 rounded-lg text-xs font-medium transition flex items-center justify-center gap-1">
+                                <i class="fa-solid fa-trash"></i> Delete
                             </button>
                         </div>
                     `;
@@ -260,18 +274,17 @@
 
                 card.innerHTML = `
                     <div class="space-y-3">
-                        <!-- Renderizado garantizado del elemento IMG con la URL de la API -->
-                        ${(currentTab === 'characters' || currentTab === 'products') 
-                            ? `<img src="${imageSrc}" alt="${item.name}" class="w-full h-44 object-cover rounded-xl border border-slate-800/80" onerror="this.onerror=null;this.src='https://rickandmortyapi.com/api/character/avatar/1.jpeg';">` 
+                        ${(currentTab === 'characters' || currentTab === 'products')
+                            ? `<img src="${imageSrc}" alt="${item.name}" class="w-full h-40 sm:h-44 object-cover rounded-xl border border-slate-800/80" onerror="this.onerror=null;this.src='https://rickandmortyapi.com/api/character/avatar/1.jpeg';">`
                             : ''}
-                        <h3 class="font-bold text-white text-sm group-hover:text-indigo-400 transition line-clamp-1">${item.name || item.title}</h3>
+                        <h3 class="font-bold text-white text-sm group-hover:text-indigo-400 transition line-clamp-1 break-words">${item.name || item.title}</h3>
                         <p class="text-[11px] text-slate-400 line-clamp-1">${cardSubtitle}</p>
                     </div>
 
                     <div>
                         <div class="pt-3 mt-3 border-t border-slate-800/80 flex justify-between items-center text-xs">
                             <span class="text-emerald-400 font-bold text-xs">${currentTab === 'products' ? `$${(item.price || 0).toFixed(2)}` : '$' + ((item.id || 1) * 3.5 + 12).toFixed(2)}</span>
-                            <span class="text-slate-500 text-[11px]">Ver Detalle →</span>
+                            <span class="text-slate-500 text-[11px]">View Detail →</span>
                         </div>
                         ${actionButtons}
                     </div>
@@ -280,30 +293,29 @@
             });
         }
 
-      // Open modal window displaying item photo and details
         function openModal(item) {
             document.getElementById('modalBadge').innerText = currentTab.toUpperCase();
             document.getElementById('modalTitle').innerText = item.name || item.title;
 
             let subtitleText = '';
             if (item.episode && Array.isArray(item.episode)) {
-                subtitleText = `Aparece en ${item.episode.length} episodio(s)`;
+                subtitleText = `Appears in ${item.episode.length} episode(s)`;
             } else {
-                subtitleText = item.description || item.type || item.dimension || 'Sin descripción adicional';
+                subtitleText = item.description || item.type || item.dimension || 'No additional description';
             }
             document.getElementById('modalSubtitle').innerText = subtitleText;
 
             const modalImage = document.getElementById('modalImage');
             const imageSrc = item.image || item.imageUrl || ('https://rickandmortyapi.com/api/character/avatar/' + (item.id || 1) + '.jpeg');
-            
+
             modalImage.src = imageSrc;
             modalImage.classList.remove('hidden');
 
             document.getElementById('modalExtra').innerHTML = `
                 <p><strong>ID:</strong> #${item.id}</p>
-                ${item.status ? `<p><strong>Estado:</strong> ${item.status}</p>` : ''}
-                ${item.species ? `<p><strong>Especie:</strong> ${item.species}</p>` : ''}
-                ${item.price !== undefined ? `<p><strong>Precio:</strong> $${item.price.toFixed(2)}</p>` : ''}
+                ${item.status ? `<p><strong>Status:</strong> ${item.status}</p>` : ''}
+                ${item.species ? `<p><strong>Species:</strong> ${item.species}</p>` : ''}
+                ${item.price !== undefined ? `<p><strong>Price:</strong> $${item.price.toFixed(2)}</p>` : ''}
             `;
 
             document.getElementById('detailModal').classList.remove('hidden');
@@ -313,7 +325,6 @@
             document.getElementById('detailModal').classList.add('hidden');
         }
 
-      // Local CRUD Actions (POST / PUT)
         document.getElementById('productForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -344,7 +355,7 @@
                     await loadTabContent('products');
                 }
             } catch (error) {
-                console.error('Error al guardar el producto:', error);
+                console.error('Error saving product:', error);
             }
         });
 
@@ -355,8 +366,8 @@
             document.getElementById('price').value = price;
             document.getElementById('image').value = (image && !image.includes('placeholder')) ? image : '';
 
-            document.getElementById('formTitle').innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-400"></i> Editar Producto #${id}`;
-            document.getElementById('btnSave').innerHTML = `<i class="fa-solid fa-rotate"></i> Actualizar Producto`;
+            document.getElementById('formTitle').innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-400"></i> Edit Product #${id}`;
+            document.getElementById('btnSave').innerHTML = `<i class="fa-solid fa-rotate"></i> Update Product`;
             document.getElementById('btnCancel').classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -365,18 +376,18 @@
             document.getElementById('productForm').reset();
             document.getElementById('productId').value = '';
             document.getElementById('image').value = '';
-            document.getElementById('formTitle').innerHTML = `<i class="fa-solid fa-plus-circle"></i> Agregar Nuevo Producto`;
-            document.getElementById('btnSave').innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Guardar Producto`;
+            document.getElementById('formTitle').innerHTML = `<i class="fa-solid fa-plus-circle"></i> Add New Product`;
+            document.getElementById('btnSave').innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Save Product`;
             document.getElementById('btnCancel').classList.add('hidden');
         }
 
         async function deleteProduct(id) {
-            if (confirm(`¿Deseas eliminar el producto #${id}?`)) {
+            if (confirm(`Do you want to delete product #${id}?`)) {
                 try {
                     const response = await fetch(`${ENDPOINTS.products}/${id}`, { method: 'DELETE' });
                     if (response.ok) await loadTabContent('products');
                 } catch (error) {
-                    console.error('Error al eliminar producto:', error);
+                    console.error('Error deleting product:', error);
                 }
             }
         }
