@@ -35,7 +35,7 @@ public class IntegrationServiceImpl implements IntegrationService {
     public List<CharacterPokemonDTO> getCharactersWithPokemon() {
         log.info("Starting nested select process for Rick and Morty characters");
         
-        Map<String, Object> response = rickAndMortyClient.getCharacters();
+        Map<String, Object> response = rickAndMortyClient.getCharacters(null);
         if (response == null || response.get("results") == null) {
             log.warn("No characters found in Rick and Morty API");
             return List.of();

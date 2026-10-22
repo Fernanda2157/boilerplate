@@ -1,11 +1,7 @@
 package com.example.boilerplate.controller;
 
 import com.example.boilerplate.service.RickAndMortyService;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
@@ -19,9 +15,10 @@ public class RickAndMortyController {
         this.service = service;
     }
 
+    // Accepts an optional 'name' query parameter from the frontend
     @GetMapping("/characters")
-    public Map<String, Object> getCharacters() {
-        return service.getCharacters();
+    public Map<String, Object> getCharacters(@RequestParam(required = false) String name) {
+        return service.getCharacters(name);
     }
 
     @GetMapping("/locations")

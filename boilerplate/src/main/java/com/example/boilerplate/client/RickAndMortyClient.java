@@ -4,9 +4,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import java.util.Map;
 
-/**
- * Client responsible for HTTP communication with the Rick and Morty API.
- */
 @Component
 public class RickAndMortyClient {
     
@@ -17,9 +14,15 @@ public class RickAndMortyClient {
         this.restTemplate = restTemplate;
     }
 
-    public Map<String, Object> getCharacters() {
-        return restTemplate.getForObject(BASE_URL + "character", Map.class);
+    // Accepts 'name' parameter for filtering
+    public Map<String, Object> getCharacters(String name) {
+        String url = BASE_URL + "character";
+        if (name != null && !name.trim().isEmpty()) {
+            url += "?name=" + name.trim();
+        }
+        return restTemplate.getForObject(url, Map.class);
     }
+
     public Map<String, Object> getLocations() {
         return restTemplate.getForObject(BASE_URL + "location", Map.class);
     }

@@ -2,7 +2,6 @@ package com.example.boilerplate.service;
 
 import com.example.boilerplate.client.RickAndMortyClient;
 import org.springframework.stereotype.Service;
-
 import java.util.Map;
 
 @Service
@@ -15,8 +14,8 @@ public class RickAndMortyServiceImpl implements RickAndMortyService {
     }
 
     @Override
-    public Map<String, Object> getCharacters() {
-        return client.getCharacters();
+    public Map<String, Object> getCharacters(String name) {
+        return client.getCharacters(name);
     }
 
     @Override
