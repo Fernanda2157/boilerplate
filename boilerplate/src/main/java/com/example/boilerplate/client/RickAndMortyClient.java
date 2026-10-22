@@ -20,4 +20,11 @@ public class RickAndMortyClient {
     public Map<String, Object> getCharacters() {
         return restTemplate.getForObject(BASE_URL + "character", Map.class);
     }
+    public Map<String, Object> getLocations() {
+        return restTemplate.getForObject(BASE_URL + "location", Map.class);
+    }
+
+    public Map<String, Object> getEpisodes() {
+        return restTemplate.getForObject(BASE_URL + "episode", Map.class);
+    }
 }
