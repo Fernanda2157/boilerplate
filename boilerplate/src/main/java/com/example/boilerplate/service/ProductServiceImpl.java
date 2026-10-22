@@ -1,7 +1,8 @@
 package com.example.boilerplate.service;
 
 import com.example.boilerplate.model.Product;
-import com.example.boilerplate.model.ProductDTO;
+import com.example.boilerplate.dto.ProductDTO; // <-- IMPORT ACTUALIZADO
+import com.example.boilerplate.exception.ResourceNotFoundException; // <-- NUEVO IMPORT
 import com.example.boilerplate.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 
@@ -40,7 +41,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductDTO updateProduct(Long id, ProductDTO productDTO) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+                // AQUÍ APLICAMOS EL CAMBIO DE CLEAN CODE
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id)); 
 
         product.setName(productDTO.getName());
         product.setDescription(productDTO.getDescription());
@@ -52,6 +54,10 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void deleteProduct(Long id) {
+        // Es una buena práctica verificar si existe antes de borrar
+        if (!productRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Product not found with id: " + id);
+        }
         productRepository.deleteById(id);
     }
 
