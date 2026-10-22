@@ -1,4 +1,3 @@
-package com.example.boilerplate.dto;
 
 package com.example.boilerplate.dto;
 

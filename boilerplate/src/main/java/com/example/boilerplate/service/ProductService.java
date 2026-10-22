@@ -1,5 +1,5 @@
 package com.example.boilerplate.service;
-import com.example.boilerplate.model.ProductDTO;
+import com.example.boilerplate.dto.ProductDTO;
 import java.util.List;
 import java.util.Optional;
 

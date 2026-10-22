@@ -1,6 +1,6 @@
 package com.example.boilerplate.controller;
 
-import com.example.boilerplate.model.ProductDTO;
+import com.example.boilerplate.dto.ProductDTO;
 import com.example.boilerplate.service.ProductService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
