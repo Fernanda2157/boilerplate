@@ -1,8 +1,8 @@
 package com.example.boilerplate.service;
 
 import com.example.boilerplate.model.Product;
-import com.example.boilerplate.dto.ProductDTO; // <-- IMPORT ACTUALIZADO
-import com.example.boilerplate.exception.ResourceNotFoundException; // <-- NUEVO IMPORT
+import com.example.boilerplate.dto.ProductDTO; 
+import com.example.boilerplate.exception.ResourceNotFoundException; 
 import com.example.boilerplate.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 
