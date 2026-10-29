@@ -6,7 +6,7 @@ async function fetchData(endpoint, query = '') {
     let url = `${API_BASE}/${endpoint}`;
     
     // Append the query parameter if it exists
-    if (query && endpoint.startWith('rick-and-morty')) {
+    if (query && endpoint.starsWith('rick-and-morty')) {
         url += `?name=${encodeURIComponent(query)}`;
     }
     
