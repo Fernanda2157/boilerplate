@@ -6,9 +6,9 @@ async function fetchData(endpoint, query = '') {
     let url = `${API_BASE}/${endpoint}`;
     
     // Append the query parameter if it exists
-    if (query && endpoint.starsWith('rick-and-morty')) {
-        url += `?name=${encodeURIComponent(query)}`;
-    }
+    if (query && endpoint.startsWith('rick-and-morty/characters')) {
+    url += `?name=${encodeURIComponent(query)}`;
+}
     
     const response = await fetch(url);
     // If the API returns 404 (not found), return an empty array instead of throwing
