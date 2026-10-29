@@ -6,23 +6,23 @@ import java.util.Map;
 
 @Service
 public class RickAndMortyServiceImpl implements RickAndMortyService {
-
+    
     private final RickAndMortyClient client;
-
+    
     public RickAndMortyServiceImpl(RickAndMortyClient client) {
         this.client = client;
     }
-
+    
     @Override
     public Map<String, Object> getCharacters(String name) {
         return client.getCharacters(name);
     }
-
+    
     @Override
     public Map<String, Object> getLocations() {
         return client.getLocations();
     }
-
+    
     @Override
     public Map<String, Object> getEpisodes() {
         return client.getEpisodes();
