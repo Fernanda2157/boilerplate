@@ -16,7 +16,7 @@ services:
       - app-network
 
   app:
-    build: ./boilerplate
+    build: .
     container_name: mi-app
    
     depends_on:
