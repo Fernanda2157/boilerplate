@@ -1,56 +1,57 @@
-Project Overview
-This is a Full Stack application developed as a university project. It features a local Product CRUD (Create, Read, Update, Delete) and an Integration Service that consumes external APIs (Rick and Morty and PokeAPI) using a "Nested Select" pattern. The project is built following Clean Code principles and Layered Architecture.
+# 🚀 Rick and Morty Explorer & Products - Boilerplate
 
-🛠️ Tech Stack
-Backend: Java 17, Spring Boot 3, Spring Data JPA, H2 Database (In-Memory).
 
-Frontend: HTML5, Tailwind CSS (via CDN), Vanilla JavaScript (ES6 Modules).
 
-Tools: Maven, Jira (Scrum), GitHub (Git Flow & Conventional Commits).
+---
 
-🏗️ Architecture & Clean Code (Backend)
-The backend strictly follows the Single Responsibility Principle (SRP):
+## 🇬🇧 English
 
-controller: Handles HTTP requests and responses (REST).
+### 📖 Project Overview
+This is a Full Stack application developed as a university project. It features a local Product CRUD and a Rick and Morty API proxy. Built with **Clean Code**, **Layered Architecture**, and **DevOps best practices**.
 
-service: Contains business logic and orchestrates the "Nested Select" with caching (ConcurrentHashMap).
+### 🏗️ Architecture
+The system implements a microservices architecture with an API Gateway:
 
-client: Pure HTTP clients (RestTemplate) dedicated solely to external API communication.
+1.  **Client:** HTML5, Tailwind CSS, Vanilla JS (ES6 Modules).
+2.  **API Gateway (Port 80):** Spring Cloud Gateway. Single entry point, handles routing and security. Hides the port from the URL.
+3.  **Backend (Port 8081):** Spring Boot. Handles business logic, CRUD, and external API proxies. Protected from direct internet access.
+4.  **Database (Port 5432):** PostgreSQL. Persistent data storage.
 
-dto / model: Separation of data transfer objects and database entities.
+**Flow:** User → http://IP (Port 80) → API Gateway → Backend (8081, Internal) → PostgreSQL (5432)
 
-exception: Global exception handling using @RestControllerAdvice.
+### 🛠️ Tech Stack
+*   **Backend:** Java 17, Spring Boot 3, Spring Data JPA, Spring Cloud Gateway.
+*   **Frontend:** HTML5, Tailwind CSS, Vanilla JavaScript (ES6 Modules).
+*   **Database:** PostgreSQL 15.
+*   **DevOps:** Docker, Docker Compose, AWS EC2, GitHub Actions (CI/CD).
 
-🔌 API Endpoints
-Products (CRUD):
+### 🧹 Clean Code Principles
+*   **SRP:** Gateway routes; Backend handles logic; Frontend renders.
+*   **YAGNI:** Removed unused Pokémon integration.
+*   **Modularity:** Frontend separated into `api.js`, `ui.js`, `utils.js`.
+*   **Security:** API Gateway hides backend. Backend in internal Docker network.
 
-GET /api/products
+### 🚀 How to Run (Local)
+1.  Clone the repo.
+2.  Navigate to root: `cd boilerplate`
+3.  Run Docker Compose: `docker-compose up -d --build`
+4.  Open browser at: `http://localhost`
 
-POST /api/products
+### ☁️ Deployment (AWS EC2)
+1.  Launch EC2 instance (Amazon Linux 2023).
+2.  Install Docker & Docker Compose.
+3.  Clone repo and run: `docker-compose up -d --build`
+4.  **CI/CD:** GitHub Action deploys changes from `main` branch via SSH.
 
-PUT /api/products/{id}
+### 🔌 API Endpoints
+*   **Products (CRUD):**
+    *   `GET /api/products`
+    *   `POST /api/products`
+    *   `PUT /api/products/{id}`
+    *   `DELETE /api/products/{id}`
+*   **External Proxy:**
+    *   `GET /api/rick-and-morty/characters?name={name}`
+    *   `GET /api/rick-and-morty/locations`
+    *   `GET /api/rick-and-morty/episodes`
 
-DELETE /api/products/{id}
-
-External Proxy:
-
-GET /api/rick-and-morty/characters?name={name}
-
-GET /api/rick-and-morty/locations
-
-GET /api/rick-and-morty/episodes
-
-Nested Select Integration:
-
-GET /api/integration/characters-with-pokemon
-
-🚀 How to Run
-Clone the repository.
-
-Open the project in IntelliJ IDEA or VS Code.
-
-Run the Spring Boot application:
-
-bash
-./mvnw spring-boot:run
-Open your browser at http://localhost:8080.
+---
