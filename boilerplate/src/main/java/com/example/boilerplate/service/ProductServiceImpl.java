@@ -41,7 +41,6 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductDTO updateProduct(Long id, ProductDTO productDTO) {
         Product product = productRepository.findById(id)
-                // AQUÍ APLICAMOS EL CAMBIO DE CLEAN CODE
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id)); 
 
         product.setName(productDTO.getName());
@@ -54,7 +53,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void deleteProduct(Long id) {
-        // Es una buena práctica verificar si existe antes de borrar
+   
         if (!productRepository.existsById(id)) {
             throw new ResourceNotFoundException("Product not found with id: " + id);
         }
