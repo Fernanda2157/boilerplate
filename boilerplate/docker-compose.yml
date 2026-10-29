@@ -18,8 +18,7 @@ services:
   app:
     build: .
     container_name: mi-app
-    ports:
-      - "8080:8080"
+   
     depends_on:
       - db
     environment:
@@ -28,7 +27,17 @@ services:
       - SPRING_DATASOURCE_PASSWORD=Admin1234
     networks:
       - app-network
-
+  gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "80:80"
+    depends_on:
+      - app
+    environment:
+      - BOILERPLATE_SERVICE_URL=http://app:8081
+    networks:
+      - app-network
 networks:
   app-network:
     driver: bridge
